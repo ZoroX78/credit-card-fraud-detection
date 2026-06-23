@@ -1,0 +1,44 @@
+data:
+  raw_path: "data/creditcard.csv"
+  processed_path: "data/creditcard_processed.csv"
+  test_size: 0.2
+  random_state: 42
+  target_col: "Class"
+
+features:
+  # The dataset has V1-V28, Time, Amount.
+  # We will add engineered features like:
+  # - Amount_Log (log transform of amount)
+  # - Hour_Of_Day (Time is in seconds, so we can extract hour)
+  # - V_Feature interactions or statistical summary of V-features per transaction
+  engineered_cols:
+    - "Amount_Log"
+    - "Hour_Of_Day"
+    - "V_Mean"
+    - "V_Std"
+    - "Amount_to_V_Ratio"
+
+smote:
+  sampling_strategy: 0.05 # Resample minority class to 5% of majority class to avoid over-inflating noise
+  random_state: 42
+
+optuna:
+  n_trials: 50
+  random_state: 42
+
+mlflow:
+  experiment_name: "Credit_Card_Fraud_Detection"
+  tracking_uri: "mlruns" # Local MLflow tracking
+
+model:
+  path: "models/xgboost_fraud_model.json"
+  threshold_path: "models/optimal_threshold.json"
+
+api:
+  host: "127.0.0.1"
+  port: 8000
+  title: "Credit Card Fraud Detection API"
+
+business:
+  avg_fraud_amount: 150.0 # Average loss prevented per True Positive
+  cost_of_false_positive: 15.0 # Verification/manual review cost + friction/churn penalty per False Positive
